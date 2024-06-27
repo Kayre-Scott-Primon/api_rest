@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loja de Games</title>
+    <hr />
+    <h4>Lista de Games</h4>
+    <ul id="games"></ul>
+    <hr />
+    <h4>Novo Game</h4>
+    <input type="text" name="title" id="title" placeholder="Título" />
+    <br />
+    <input type="number" name="year" id="year" placeholder="Ano" />
+    <br />
+    <input type="number" name="price" id="price" placeholder="Preço" />
+    <br />
+    <button type="button" onclick="createGame()">Criar</button>
+    <hr />
+    <h4>Editar Game</h4>
+    <input type="text" name="idEdit" id="idEdit" placeholder="ID" readonly />
+    <br />
+    <input type="text" name="titleEdit" id="titleEdit" placeholder="Título" />
+    <br />
+    <input type="number" name="yearEdit" id="yearEdit" placeholder="Ano" />
+    <br />
+    <input type="number" name="priceEdit" id="priceEdit" placeholder="Preço" />
+    <br />
+    <button type="button" onclick="editGame()">Editar</button>
+  </head>
+  <body></body>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+  <script>
+    function createGame() {
+      var titleInput = document.getElementById("title");
+      var yearInput = document.getElementById("year");
+      var priceInput = document.getElementById("price");
+
+      var game = {
+        title: titleInput.value,
+        year: yearInput.value,
+        price: priceInput.value,
+      };
+
+      axios
+        .post("http://localhost:45678/game", game)
+        .then((response) => {
+          console.log(response);
+          alert("Game criado com sucesso!");
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Erro ao criar game!");
+        });
+    }
+
+    function deleteGame(lisItem) {
+      var id = listItem.getAttribute("data-id");
+      axios
+        .delete("http://localhost:45678/game/" + id)
+        .then((response) => {
+          console.log(response);
+          alert("Game deletado com sucesso!");
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Erro ao deletar game!");
+        });
+    }
+
+    function loadForm(listItem) {
+      var id = listItem.getAttribute("data-id");
+      var title = listItem.getAttribute("data-title");
+      var year = listItem.getAttribute("data-year");
+      var price = listItem.getAttribute("data-price");
+
+      document.getElementById("idEdit").value = id;
+      document.getElementById("titleEdit").value = title;
+      document.getElementById("yearEdit").value = year;
+      document.getElementById("priceEdit").value = price;
+    }
+
+    function editGame() {
+      var idInput = document.getElementById("idEdit");
+      var titleInput = document.getElementById("titleEdit");
+      var yearInput = document.getElementById("yearEdit");
+      var priceInput = document.getElementById("priceEdit");
+
+      var game = {
+        title: titleInput.value,
+        year: yearInput.value,
+        price: priceInput.value,
+      };
+
+      axios
+        .put("http://localhost:45678/game/" + idInput.value, game)
+        .then((response) => {
+          console.log(response);
+          alert("Game editado com sucesso!");
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Erro ao editar game!");
+        });
+
+      var idInput = (document.getElementById("idEdit").value = "");
+      var titleInput = (document.getElementById("titleEdit").value = "");
+      var yearInput = (document.getElementById("yearEdit").value = "");
+      var priceInput = (document.getElementById("priceEdit").value = "");
+    }
+
+    axios
+      .get("http://localhost:45678/games")
+      .then((response) => {
+        console.log(response);
+        var games = response.data;
+        var list = document.getElementById("games");
+
+        games.forEach((element) => {
+          var item = document.createElement("li");
+
+          item.setAttribute("data-id", element.id);
+          item.setAttribute("data-title", element.title);
+          item.setAttribute("data-price", element.price);
+          item.setAttribute("data-year", element.year);
+
+          item.innerHTML =
+            element.id + " - " + element.title + " - " + element.price;
+
+          var deleteBtn = document.createElement("button");
+          deleteBtn.innerHTML = "Deletar";
+          deleteBtn.addEventListener("click", () => deleteBtn(item));
+
+          var editBtn = document.createElement("button");
+          editBtn.innerHTML = "Editar";
+          editBtn.addEventListener("click", () => loadForm(item));
+
+          item.appendChild(deleteBtn);
+          item.appendChild(editBtn);
+
+          list.appendChild(item);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  </script>
+</html>
