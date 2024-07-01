@@ -12,6 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 function auth(req, res, next) {
+  console.log('auth')
   const authToken = req.headers["authorization"];
 
   if (authToken != undefined) {
