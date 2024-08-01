@@ -78,8 +78,27 @@ var DB = {
 };
 
 app.get("/games", auth, (req, res) => {
+
+  const HATEOAS = [
+    {
+      href: "http://localhost:45678/game/0",
+      method: "DELETE",
+      rel: "delete_game",
+    },
+    {
+      href: "http://localhost:45678/game/0",
+      method: "GET",
+      rel: "get_game",
+    },
+    {
+      href: "http://localhost:45678/game/0",
+      method: "PUT",
+      rel: "edit_game",
+    },
+  ];
+
   res.statusCode = 200;
-  res.json(DB.games);
+  res.json({ games: DB.games, _links: HATEOAS });
 });
 
 app.get("/game/:id", auth, (req, res) => {
@@ -88,9 +107,28 @@ app.get("/game/:id", auth, (req, res) => {
   } else {
     var id = parseInt(req.params.id);
     var game = DB.games.find((game) => game.id == id);
+
+    const HATEOAS = [
+      {
+        href: "http://localhost:45678/game/" + id,
+        method: "DELETE",
+        rel: "delete_game",
+      },
+      {
+        href: "http://localhost:45678/game/" + id,
+        method: "GET",
+        rel: "get_game",
+      },
+      {
+        href: "http://localhost:45678/game/" + id,
+        method: "PUT",
+        rel: "edit_game",
+      },
+    ];
+
     if (game != undefined) {
       res.statusCode = 200;
-      res.json(game);
+      res.json({ game: game, _links: HATEOAS });
     } else {
       res.statusCode = 404;
       res.send("Game not found");
